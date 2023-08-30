@@ -1,17 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Like } from './schemas/like.schema';
 import { Model } from 'mongoose';
+
+import { LikeDocument } from './interfaces/like-document.interface';
+import { Like } from './interfaces/like.interface';
 
 @Injectable()
 export class LikesService {
-    constructor(@InjectModel(Like.name) private likeModel: Model<Like>) {}
+  constructor(@InjectModel('Like') private likeModel: Model<LikeDocument>) {}
 
-    async likeMovie(movieId: string): Promise<void> {
-        await this.likeModel.findOneAndUpdate(
-          { movieId },
-          { $inc: { count: 1 } },
-          { upsert: true },
-        );
-      }
+  async create(like: Like): Promise<Like> {
+    const createdLike = new this.likeModel(like);
+    return createdLike.save();
+  }
 }
